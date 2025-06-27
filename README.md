@@ -69,7 +69,3 @@ Az API végpontok a `routes/api.php` fájlban találhatók. A főbb funkciók:
 -   Felhasználó regisztráció és bejelentkezés
 -   Barátok kezelése
 -   Üzenetküldés
-
-## Licenc
-
-Ez a projekt MIT licenc alatt érhető el.
