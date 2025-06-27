@@ -69,3 +69,25 @@ Az API végpontok a `routes/api.php` fájlban találhatók. A főbb funkciók:
 -   Felhasználó regisztráció és bejelentkezés
 -   Barátok kezelése
 -   Üzenetküldés
+
+| Method | Végpont                                   | Leírás                       |
+| ------ | ----------------------------------------- | ---------------------------- |
+| POST   | /api/v1/register                          | Regisztráció                 |
+| POST   | /api/v1/login                             | Bejelentkezés                |
+| POST   | /api/v1/logout                            | Kijelentkezés                |
+| GET    | /api/v1/me                                | Saját adatok lekérése        |
+| POST   | /api/v1/email/resend                      | Email megerősítő újraküldése |
+| GET    | /api/v1/email/verify/{id}/{hash}          | Email megerősítése           |
+| GET    | /api/v1/friends                           | Ismerősök listája            |
+| POST   | /api/v1/friends/{user}                    | Ismerős hozzáadása           |
+| DELETE | /api/v1/friends/{user}                    | Ismerős eltávolítása         |
+| GET    | /api/v1/friends/check/{user}              | Barátság ellenőrzése         |
+| GET    | /api/v1/friends/mutual/{user}             | Közös ismerősök              |
+| GET    | /api/v1/friends/suggestions               | Ismerős javaslatok           |
+| POST   | /api/v1/messages                          | Üzenet küldése               |
+| GET    | /api/v1/messages/conversations            | Beszélgetések listája        |
+| GET    | /api/v1/messages/conversation/{user}      | Beszélgetés lekérése         |
+| PATCH  | /api/v1/messages/conversation/{user}/read | Olvasottnak jelölés          |
+| GET    | /api/v1/messages/unread-count             | Olvasatlan üzenetek száma    |
+| DELETE | /api/v1/messages/{messageId}              | Üzenet törlése               |
+| GET    | /api/v1/messages/search                   | Üzenetek keresése            |
