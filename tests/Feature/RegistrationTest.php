@@ -15,7 +15,7 @@ class RegistrationTest extends TestCase
      */
     public function test_successful_registration_and_email_verification()
     {
-        $response = $this->postJson('/api/register', [
+        $response = $this->postJson('/api/v1/register', [
             'name' => 'Teszt Elek',
             'email' => 'teszt1@example.com',
             'password' => 'password',
