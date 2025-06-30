@@ -75,6 +75,7 @@ Az API végpontok a `routes/api.php` fájlban találhatók. A főbb funkciók:
 | POST   | /api/v1/register                          | Regisztráció                 |
 | POST   | /api/v1/login                             | Bejelentkezés                |
 | POST   | /api/v1/logout                            | Kijelentkezés                |
+| GET    | /api/v1/users                             | Felhasználók listája         |
 | GET    | /api/v1/me                                | Saját adatok lekérése        |
 | POST   | /api/v1/email/resend                      | Email megerősítő újraküldése |
 | GET    | /api/v1/email/verify/{id}/{hash}          | Email megerősítése           |

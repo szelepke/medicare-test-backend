@@ -10,11 +10,11 @@ Route::middleware(['throttle:5,1'])->prefix('v1')->group(function () {
     Route::post('login', [AuthController::class, 'login']);
     Route::post('/register', [AuthController::class, 'register']);
     Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verify'])->name('verification.verify');
-    Route::post('/email/resend', [AuthController::class, 'resend'])->name('verification.send');
 });
 
 Route::middleware('auth:sanctum')->prefix('v1')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
+    Route::post('/email/resend', [AuthController::class, 'resend'])->name('verification.send');
 
     Route::get('/users', [UserController::class, 'index']);
     Route::get('/me', [UserController::class, 'me']);

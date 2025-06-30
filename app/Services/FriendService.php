@@ -114,22 +114,22 @@ class FriendService
 
     public function getMutualFriends(User $user1, User $user2): Collection
     {
-        $user1Friends = $user1->friends()->pluck('id');
+        $user1FriendIds = $user1->friends()->pluck('users.id');
         
         return $user2->friends()
-            ->whereIn('id', $user1Friends)
-            ->whereNotNull('email_verified_at')
-            ->orderBy('name')
+            ->whereIn('users.id', $user1FriendIds)
+            ->whereNotNull('users.email_verified_at')
+            ->orderBy('users.name')
             ->get();
     }
 
     public function getSuggestedFriends(User $user, int $limit = 10): Collection
     {
-        $friendIds = $user->friends()->pluck('id');
+        $friendIds = $user->friends()->pluck('users.id');
         
-        return User::whereNotIn('id', $friendIds)
-            ->where('id', '!=', $user->id)
-            ->whereNotNull('email_verified_at')
+        return User::whereNotIn('users.id', $friendIds)
+            ->where('users.id', '!=', $user->id)
+            ->whereNotNull('users.email_verified_at')
             ->whereHas('friends', function ($query) use ($friendIds) {
                 $query->whereIn('friend_id', $friendIds);
             })

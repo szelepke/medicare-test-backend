@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Collection as SupportCollection;
 
 class MessageService
 {
@@ -56,7 +57,7 @@ class MessageService
     public function getConversation(User $user, User $otherUser, array $params = []): Collection
     {
         if (!$this->areFriends($user, $otherUser)) {
-            return collect();
+            return new Collection();
         }
 
         $query = Message::where(function($q) use ($user, $otherUser) {
@@ -77,37 +78,35 @@ class MessageService
 
         $limit = $params['limit'] ?? 50;
         
-        return $query->orderBy('created_at', 'desc')
+        $messages = $query->orderBy('created_at', 'desc')
             ->limit($limit)
-            ->get()
-            ->reverse()
-            ->values();
+            ->get();
+        
+        return new Collection($messages->reverse()->values()->all());
     }
 
-    public function getConversations(User $user, int $limit = 20): Collection
+    public function getConversations(User $user, int $limit = 20): SupportCollection
     {
+        $userId = $user->id;
+        
         $conversations = DB::table('messages as m1')
             ->select([
-                'other_user_id' => DB::raw('CASE WHEN m1.sender_id = ? THEN m1.receiver_id ELSE m1.sender_id END'),
-                'last_message' => 'm1.message',
-                'last_message_at' => 'm1.created_at',
-                'is_sender' => DB::raw('m1.sender_id = ?'),
-                'unread_count' => DB::raw('(SELECT COUNT(*) FROM messages WHERE sender_id = CASE WHEN m1.sender_id = ? THEN m1.receiver_id ELSE m1.sender_id END AND receiver_id = ? AND is_read = false)')
+                DB::raw("CASE WHEN m1.sender_id = {$userId} THEN m1.receiver_id ELSE m1.sender_id END as other_user_id"),
+                'm1.message as last_message',
+                'm1.created_at as last_message_at',
+                DB::raw("m1.sender_id = {$userId} as is_sender"),
+                DB::raw("(SELECT COUNT(*) FROM messages WHERE sender_id = CASE WHEN m1.sender_id = {$userId} THEN m1.receiver_id ELSE m1.sender_id END AND receiver_id = {$userId} AND is_read = false) as unread_count")
             ])
-            ->whereRaw('m1.id = (
+            ->whereRaw("m1.id = (
                 SELECT MAX(id) FROM messages m2 
-                WHERE (m2.sender_id = ? AND m2.receiver_id = CASE WHEN m1.sender_id = ? THEN m1.receiver_id ELSE m1.sender_id END)
-                   OR (m2.receiver_id = ? AND m2.sender_id = CASE WHEN m1.sender_id = ? THEN m1.receiver_id ELSE m1.sender_id END)
-            )')
-            ->where(function($q) use ($user) {
-                $q->where('m1.sender_id', $user->id)
-                  ->orWhere('m1.receiver_id', $user->id);
+                WHERE (m2.sender_id = {$userId} AND m2.receiver_id = CASE WHEN m1.sender_id = {$userId} THEN m1.receiver_id ELSE m1.sender_id END)
+                OR (m2.receiver_id = {$userId} AND m2.sender_id = CASE WHEN m1.sender_id = {$userId} THEN m1.receiver_id ELSE m1.sender_id END)
+            )")
+            ->where(function($q) use ($userId) {
+                $q->where('m1.sender_id', $userId)
+                ->orWhere('m1.receiver_id', $userId);
             })
-            ->setBindings([
-                $user->id, $user->id, $user->id, $user->id,
-                $user->id, $user->id, $user->id, $user->id
-            ])
-            ->orderBy('last_message_at', 'desc')
+            ->orderBy('m1.created_at', 'desc')
             ->limit($limit)
             ->get();
 
